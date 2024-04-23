@@ -322,5 +322,5 @@ ul {
 }
 
 .Toastify__toast {
-  text-transform: capitalize;
+  text-transform: none
 }
