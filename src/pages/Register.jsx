@@ -1,17 +1,23 @@
 import Wrapper from "../assets/wrappers/RegisterPage";
 import Logo from "../components/Logo";
-import { useState } from "react";
 import { FormRow } from "../components";
 import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser, registerUser } from "../features/user/userSlice";
+import { useState } from "react";
+
+const initialState = {
+  name: "",
+  email: "",
+  password: "",
+  isMember: true,
+};
 
 const Register = () => {
-  const initialState = {
-    name: "",
-    email: "",
-    password: "",
-    isMember: true,
-  };
   const [values, setValues] = useState(initialState);
+
+  const { isLoading, user } = useSelector((store) => store.user);
+  const dispatch = useDispatch();
 
   const handleChange = (event) => {
     setValues({ ...values, [event.target.name]: event.target.value });
@@ -19,21 +25,23 @@ const Register = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (
-      !values.email ||
-      !values.password ||
-      (!values.isMember && !values.name)
-    ) {
+    const { name, email, password, isMember } = values;
+    if (!email || !password || (!isMember && !name)) {
       console.log("Please, fill out all the fields!");
       toast.warn("Please, fill out all the fields!");
       return;
     }
-    setValues({ ...values, name: "", email: "", password: "" });
+    if (isMember) {
+      dispatch(loginUser({ email, password }));
+      return;
+    }
+    dispatch(registerUser({ name, email, password }));
   };
 
   const toggleMember = () => {
     setValues({ ...values, isMember: !values.isMember });
   };
+
   return (
     <Wrapper className="full-page">
       <form className="form" onSubmit={handleSubmit}>
