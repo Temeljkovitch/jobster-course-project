@@ -1,8 +1,6 @@
-import styled from "styled-components";
 import { BigSidebar, Navbar, SmallSidebar } from "../../components";
 import { Outlet } from "react-router-dom";
-
-const Wrapper = styled.section``;
+import Wrapper from "../../assets/wrappers/SharedLayout";
 
 const SharedLayout = () => {
   return (
