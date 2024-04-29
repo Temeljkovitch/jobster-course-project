@@ -7,11 +7,16 @@ import {
   SharedLayout,
   Stats,
 } from "./pages/Dashboard";
+import ProtectedRoute from "./pages/Dashboard/ProtectedRoute";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <SharedLayout />,
+    element: (
+      <ProtectedRoute>
+        <SharedLayout />
+      </ProtectedRoute>
+    ),
     errorElement: <Error />,
     children: [
       {
