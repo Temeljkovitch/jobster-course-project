@@ -37,6 +37,27 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+export const updateUser = createAsyncThunk(
+  "user/updateUser",
+  async (user, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().user.user.token;
+      const response = await customFetch.patch("/auth/updateUser", user, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      if (error.response.status === 401) {
+        thunkAPI.dispatch(logoutUser());
+        return thunkAPI.rejectWithValue("Unauthorized! Logging out...");
+      }
+      return thunkAPI.rejectWithValue(error.response.data.msg);
+    }
+  }
+);
+
 const userSlice = createSlice({
   name: "user",
   initialState,
@@ -48,7 +69,6 @@ const userSlice = createSlice({
       removeUserFromLocalStorage(state.user);
       state.user = null;
       state.isSidebarOpen = false;
-      toast.success("Logout successfully!");
     },
   },
   extraReducers: (builder) => {
@@ -58,8 +78,8 @@ const userSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user = action.payload;
         const { user } = action.payload;
+        state.user = user;
         addUserToLocalStorage(user);
         toast.success(`Hello there, ${user.name}!`);
       })
@@ -73,13 +93,28 @@ const userSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user = action.payload;
         const { user } = action.payload;
+        state.user = user;
         addUserToLocalStorage(user);
         toast.success(`Welcome back, ${user.name}!`);
       })
       .addCase(loginUser.rejected, (state, action) => {
+        state.isLoading = false;
+        const errorMessage = action.payload;
+        toast.error(errorMessage);
+      })
+      .addCase(updateUser.pending, (state) => {
         state.isLoading = true;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        const { user } = action.payload;
+        state.user = user;
+        addUserToLocalStorage(user);
+        toast.success("Profile updated successfully!");
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.isLoading = false;
         const errorMessage = action.payload;
         toast.error(errorMessage);
       });
