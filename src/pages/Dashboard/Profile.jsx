@@ -23,7 +23,7 @@ const Profile = () => {
       toast.error("Pelase, fill out all fields!");
       return;
     }
-    dispatch(updateUser({name, lastName, email, location}))
+    dispatch(updateUser({ name, lastName, email, location }));
   };
 
   const handleChange = (event) => {

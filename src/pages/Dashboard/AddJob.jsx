@@ -14,14 +14,14 @@ const AddJob = () => {
   const { user } = useSelector((store) => store.user);
 
   useEffect(() => {
-    dispatch(handleChange({ name: "location", value: user.location }));
+    dispatch(handleChange({ name: "jobLocation", value: user.location }));
   }, []);
 
   const {
     isLoading,
     position,
     company,
-    location,
+    jobLocation,
     jobType,
     jobTypeOptions,
     status,
@@ -32,13 +32,11 @@ const AddJob = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (!position || !company || !location) {
+    if (!position || !company || !jobLocation) {
       toast.error("Please, fill out all fields!");
       return;
     }
-    dispatch(
-      createJob({ position, company, location, jobType, status })
-    );
+    dispatch(createJob({ position, company, jobLocation, jobType, status }));
   };
 
   const handleJobInput = (event) => {
@@ -71,7 +69,7 @@ const AddJob = () => {
             type="text"
             name="location"
             text="job location"
-            value={location}
+            value={jobLocation}
             handleChange={handleJobInput}
           />
           {/* Status */}

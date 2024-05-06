@@ -2,12 +2,13 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { customFetch } from "../../utils";
 import { logoutUser } from "../user/userSlice";
 import { toast } from "react-toastify";
+import { hideLoading, showLoading, getAllJobs } from "../allJobs/allJobsSlice";
 
 const initialState = {
   isLoading: false,
   position: "",
   company: "",
-  location: "",
+  jobLocation: "",
   jobTypeOptions: ["full-time", "part-time", "remote", "internship"],
   jobType: "full-time",
   statusOptions: ["interview", "declined", "pending"],
@@ -38,6 +39,26 @@ export const createJob = createAsyncThunk(
   }
 );
 
+export const deleteJob = createAsyncThunk(
+  "job/deleteJob",
+  async (jobId, thunkAPI) => {
+    thunkAPI.dispatch(showLoading());
+    const token = thunkAPI.getState().user.user.token;
+    try {
+      const response = await customFetch.delete(`/jobs/${jobId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      thunkAPI.dispatch(getAllJobs());
+      return response.data;
+    } catch (error) {
+      thunkAPI.dispatch(hideLoading());
+      return thunkAPI.rejectWithValue(error.response.data.msg);
+    }
+  }
+);
+
 const jobSlice = createSlice({
   name: "job",
   initialState,
@@ -62,6 +83,13 @@ const jobSlice = createSlice({
       })
       .addCase(createJob.rejected, (state, action) => {
         state.isLoading = false;
+        const errorMessage = action.payload;
+        toast.error(errorMessage);
+      })
+      .addCase(deleteJob.fulfilled, (state) => {
+        toast.success("Job deleted successfully!");
+      })
+      .addCase(deleteJob.rejected, (state, action) => {
         const errorMessage = action.payload;
         toast.error(errorMessage);
       });
