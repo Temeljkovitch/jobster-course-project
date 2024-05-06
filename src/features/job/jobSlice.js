@@ -22,11 +22,7 @@ export const createJob = createAsyncThunk(
   async (job, thunkAPI) => {
     try {
       const token = thunkAPI.getState().user.user.token;
-      const response = await customFetch.post("/jobs", job, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await customFetch.post("/jobs", job);
       thunkAPI.dispatch(clearValues());
       return response.data;
     } catch (error) {
@@ -39,17 +35,27 @@ export const createJob = createAsyncThunk(
   }
 );
 
+export const editJob = createAsyncThunk(
+  "job/editJob",
+  async ({ jobId, job }, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().user.user.token;
+      const response = await customFetch.patch(`/jobs/${jobId}`, job);
+      thunkAPI.dispatch(clearValues());
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data.msg);
+    }
+  }
+);
+
 export const deleteJob = createAsyncThunk(
   "job/deleteJob",
   async (jobId, thunkAPI) => {
     thunkAPI.dispatch(showLoading());
     const token = thunkAPI.getState().user.user.token;
     try {
-      const response = await customFetch.delete(`/jobs/${jobId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await customFetch.delete(`/jobs/${jobId}`);
       thunkAPI.dispatch(getAllJobs());
       return response.data;
     } catch (error) {
@@ -68,8 +74,11 @@ const jobSlice = createSlice({
       const value = action.payload.value;
       state[name] = value;
     },
-    clearValues: (state, action) => {
+    clearValues: () => {
       return initialState;
+    },
+    setEditJob: (state, action) => {
+      return { ...state, isEditing: true, ...action.payload };
     },
   },
   extraReducers: (builder) => {
@@ -86,16 +95,28 @@ const jobSlice = createSlice({
         const errorMessage = action.payload;
         toast.error(errorMessage);
       })
-      .addCase(deleteJob.fulfilled, (state) => {
+      .addCase(deleteJob.fulfilled, () => {
         toast.success("Job deleted successfully!");
       })
-      .addCase(deleteJob.rejected, (state, action) => {
+      .addCase(deleteJob.rejected, (_, action) => {
+        const errorMessage = action.payload;
+        toast.error(errorMessage);
+      })
+      .addCase(editJob.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(editJob.fulfilled, (state) => {
+        state.isLoading = false;
+        toast.success("Job updated successfully!");
+      })
+      .addCase(editJob.rejected, (state, action) => {
+        state.isLoading = false;
         const errorMessage = action.payload;
         toast.error(errorMessage);
       });
   },
 });
 
-export const { handleChange, clearValues } = jobSlice.actions;
+export const { handleChange, clearValues, setEditJob } = jobSlice.actions;
 
 export default jobSlice.reducer;

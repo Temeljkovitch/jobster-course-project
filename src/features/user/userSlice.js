@@ -42,11 +42,7 @@ export const updateUser = createAsyncThunk(
   async (user, thunkAPI) => {
     try {
       const token = thunkAPI.getState().user.user.token;
-      const response = await customFetch.patch("/auth/updateUser", user, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await customFetch.patch("/auth/updateUser", user);
       return response.data;
     } catch (error) {
       if (error.response.status === 401) {
@@ -69,8 +65,8 @@ const userSlice = createSlice({
       removeUserFromLocalStorage(state.user);
       state.user = null;
       state.isSidebarOpen = false;
-      if(action.payload) {
-        toast.success(action.payload)
+      if (action.payload) {
+        toast.success(action.payload);
       }
     },
   },
