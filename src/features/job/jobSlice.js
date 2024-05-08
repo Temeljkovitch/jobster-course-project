@@ -21,7 +21,6 @@ export const createJob = createAsyncThunk(
   "job/createJob",
   async (job, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().user.user.token;
       const response = await customFetch.post("/jobs", job);
       thunkAPI.dispatch(clearValues());
       return response.data;
@@ -39,7 +38,6 @@ export const editJob = createAsyncThunk(
   "job/editJob",
   async ({ jobId, job }, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().user.user.token;
       const response = await customFetch.patch(`/jobs/${jobId}`, job);
       thunkAPI.dispatch(clearValues());
       return response.data;
@@ -53,7 +51,7 @@ export const deleteJob = createAsyncThunk(
   "job/deleteJob",
   async (jobId, thunkAPI) => {
     thunkAPI.dispatch(showLoading());
-    const token = thunkAPI.getState().user.user.token;
+
     try {
       const response = await customFetch.delete(`/jobs/${jobId}`);
       thunkAPI.dispatch(getAllJobs());

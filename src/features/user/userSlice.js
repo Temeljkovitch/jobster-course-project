@@ -41,7 +41,6 @@ export const updateUser = createAsyncThunk(
   "user/updateUser",
   async (user, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().user.user.token;
       const response = await customFetch.patch("/auth/updateUser", user);
       return response.data;
     } catch (error) {

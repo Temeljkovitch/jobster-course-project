@@ -80,9 +80,21 @@ const Register = () => {
           value={values.password}
           handleChange={handleChange}
         />
-        {/* Button */}
+        {/* Buttons */}
         <button type="submit" className="btn btn-block" disabled={isLoading}>
           {isLoading ? "loading..." : "submit"}
+        </button>
+        <button
+          type="buttons"
+          className="btn btn-block btn-hipster"
+          disabled={isLoading}
+          onClick={() =>
+            dispatch(
+              loginUser({ email: "testUser@test.com", password: "secret" })
+            )
+          }
+        >
+          {isLoading ? "loading..." : "demo"}
         </button>
         <p>
           {values.isMember ? "Not a member yet?" : "Already a member?"}
