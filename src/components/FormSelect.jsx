@@ -1,6 +1,6 @@
 import React from "react";
 
-const FormSelect = ({ name, defaultValue, text, options, handleChange }) => {
+const FormSelect = ({ name, value, text, options, handleChange }) => {
   return (
     <div className="form-row">
       <label htmlFor={name} className="form-label">
@@ -9,7 +9,7 @@ const FormSelect = ({ name, defaultValue, text, options, handleChange }) => {
       <select
         name={name}
         id={name}
-        value={defaultValue}
+        value={value}
         onChange={handleChange}
         className="form-select"
       >
