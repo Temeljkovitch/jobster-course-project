@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { customFetch } from "../../utils";
+import { checkForUnauthorizedResponse, customFetch } from "../../utils";
 import { toast } from "react-toastify";
 
 const initialFiltersState = {
@@ -34,7 +34,7 @@ export const getAllJobs = createAsyncThunk(
       const response = await customFetch.get(url);
       return response.data;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data.msg);
+      return checkForUnauthorizedResponse(error, thunkAPI);
     }
   }
 );
@@ -46,7 +46,7 @@ export const showStats = createAsyncThunk(
       const response = await customFetch.get("/jobs/stats");
       return response.data;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data.msg);
+      return checkForUnauthorizedResponse(error, thunkAPI);
     }
   }
 );
@@ -62,6 +62,7 @@ const allJobsSlice = createSlice({
       state.isLoading = false;
     },
     handleChange: (state, action) => {
+      state.page = 1;
       state[action.payload.name] = action.payload.value;
     },
     clearFilters: (state) => {
@@ -69,6 +70,9 @@ const allJobsSlice = createSlice({
     },
     changePage: (state, action) => {
       state.page = action.payload;
+    },
+    clearAllJobsState: (state) => {
+      return initialState;
     },
   },
   extraReducers: (builder) => {
@@ -109,6 +113,7 @@ export const {
   handleChange,
   clearFilters,
   changePage,
+  clearAllJobsState,
 } = allJobsSlice.actions;
 
 export default allJobsSlice.reducer;

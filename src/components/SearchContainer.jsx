@@ -3,8 +3,10 @@ import Wrapper from "../assets/wrappers/SearchContainer";
 import FormRow from "./FormRow";
 import FormSelect from "./FormSelect";
 import { clearFilters, handleChange } from "../features/allJobs/allJobsSlice";
+import { useMemo, useState } from "react";
 
 const SearchContainer = () => {
+  const [localSearch, setLocalSearch] = useState("");
   const { isLoading, search, searchStatus, searchType, sort, sortOptions } =
     useSelector((store) => store.allJobs);
   const { jobTypeOptions, statusOptions } = useSelector((store) => store.job);
@@ -12,6 +14,7 @@ const SearchContainer = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    setLocalSearch("");
     dispatch(clearFilters());
   };
 
@@ -20,6 +23,21 @@ const SearchContainer = () => {
     const value = event.target.value;
     dispatch(handleChange({ name, value }));
   };
+
+  const debounce = () => {
+    let timeoutID;
+    return (event) => {
+      setLocalSearch(event.target.value);
+      clearTimeout(timeoutID);
+      timeoutID = setTimeout(() => {
+        dispatch(
+          handleChange({ name: event.target.name, value: event.target.value })
+        );
+      }, 1000);
+    };
+  };
+
+  const optimizedDebounce = useMemo(() => debounce());
 
   return (
     <Wrapper>
@@ -30,8 +48,8 @@ const SearchContainer = () => {
           <FormRow
             type="text"
             name="search"
-            value={search}
-            handleChange={handleSearch}
+            value={localSearch}
+            handleChange={optimizedDebounce}
           />
           {/* Search by Status */}
           <FormSelect
